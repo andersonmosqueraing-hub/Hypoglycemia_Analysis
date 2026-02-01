@@ -26,9 +26,7 @@ def Loading_File(file_path):
     MasterDF = MasterDF.rename(columns={'DateTime':'ts','PtID':'id','GlucoseValue':'gl'})
     MasterDF= MasterDF.reset_index(drop=True)
     MasterDF = MasterDF.drop_duplicates(subset=['ts','id'])
-    data = MasterDF.pivot(index='ts', columns=['id'], values=['gl'])
-    data.columns = data.columns.get_level_values(level='id')
-    return data
+    return MasterDF
 Replace = Loading_File(path)
 # AIDE
 path = r"C:\Users\Mosqu\universidadean.edu.co\MAIRA ALEJANDRA GARCIA JARAMILLO - ML_Analitica_Diabetes\AIDE T1D\Data Tables\AIDEDeviceCGM.txt"
@@ -43,9 +41,7 @@ def Loading_File(file_path):
     MasterDF = MasterDF.rename(columns={'DateTime':'ts','PtID':'id','GlucValue':'gl'})
     MasterDF= MasterDF.reset_index(drop=True)
     MasterDF = MasterDF.drop_duplicates(subset=['ts','id'])
-    data = MasterDF.pivot(index='ts', columns=['id'], values=['gl'])
-    data.columns = data.columns.get_level_values(level='id')
-    return data
+    return MasterDF
 AIDE = Loading_File(path)
 # Shanghai
 from pathlib import Path
@@ -75,7 +71,3 @@ def Loading_File(file_path):
 Shanghai_T1D = Loading_File(T1D)
 Shanghai_T2D = Loading_File(T2D)
 Shanghai = pd.concat([Shanghai_T1D, Shanghai_T2D])
-#pivoting the dataset
-data = Shanghai.pivot(index='ts', columns=['id'], values=['gl'])
-data.columns = data.columns.get_level_values(level='id')
-Shanghai = data

@@ -88,7 +88,7 @@ def get_labelled_sequences(data, time_worn_threshold, glucose_threshold, event_d
             
             # extract the patient's data over the subsequent week
             Y = data[patient].iloc[t: t + sequence_length]
-            print(Y)
+
             # check if the patient has worn the device for a sufficient time over both weeks
             if pd.notna(X).mean() >= time_worn_threshold and pd.notna(Y).mean() >= time_worn_threshold: 
                 
