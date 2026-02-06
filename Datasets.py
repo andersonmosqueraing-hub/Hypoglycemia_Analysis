@@ -2,13 +2,12 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-import ptitprince as pt
 pd.options.display.max_rows = 999
 import warnings
 warnings.filterwarnings("ignore")
 import sys
 sys.dont_write_bytecode = True
+from src.New_Utils import New_Sequences
 # Replace
 path = r"C:\Users\Mosqu\universidadean.edu.co\MAIRA ALEJANDRA GARCIA JARAMILLO - ML_Analitica_Diabetes\REPLACE-BG Dataset-79f6bdc8-3c51-4736-a39f-c4c0f71d45e5\Data Tables\HDeviceCGM.txt"
 def Loading_File(file_path):
@@ -28,6 +27,8 @@ def Loading_File(file_path):
     MasterDF = MasterDF.drop_duplicates(subset=['ts','id'])
     return MasterDF
 Replace = Loading_File(path)
+
+
 # AIDE
 path = r"C:\Users\Mosqu\universidadean.edu.co\MAIRA ALEJANDRA GARCIA JARAMILLO - ML_Analitica_Diabetes\AIDE T1D\Data Tables\AIDEDeviceCGM.txt"
 def Loading_File(file_path):
@@ -35,7 +36,7 @@ def Loading_File(file_path):
     MasterDF = MasterDF[MasterDF['RecordType'] == 'CGM']
     #Creating a date time column
     MasterDF['DateTime'] = MasterDF['DataDtTm']
-    MasterDF['DateTime'] = pd.to_datetime(MasterDF.DateTime, errors='coerce', infer_datetime_format=True)
+    MasterDF['DateTime'] = pd.to_datetime(MasterDF.DateTime, errors='coerce')
     #selecting just the columns for Giammarino's code to run
     MasterDF = MasterDF[['PtID','DateTime','GlucValue']]
     MasterDF = MasterDF.rename(columns={'DateTime':'ts','PtID':'id','GlucValue':'gl'})
@@ -43,6 +44,8 @@ def Loading_File(file_path):
     MasterDF = MasterDF.drop_duplicates(subset=['ts','id'])
     return MasterDF
 AIDE = Loading_File(path)
+
+
 # Shanghai
 from pathlib import Path
 T1D = r"C:\Users\Mosqu\universidadean.edu.co\MAIRA ALEJANDRA GARCIA JARAMILLO - ML_Analitica_Diabetes\Dataset Shangai\Shanghai_T1DM"
@@ -59,7 +62,7 @@ def Loading_File(file_path):
             df_temp = df_temp.rename(columns={df_temp.columns[0]: 'DateTime'})
             df_temp = df_temp.rename(columns={df_temp.columns[1]: 'GlucValue'})
             df_temp['PtID'] = pti
-            df_temp['DateTime'] = pd.to_datetime(df_temp.DateTime, errors='coerce', infer_datetime_format=True)
+            df_temp['DateTime'] = pd.to_datetime(df_temp.DateTime, errors='coerce')
             df_temp = df_temp[['PtID','DateTime','GlucValue']]
             df_temp = df_temp.rename(columns={'DateTime':'ts','PtID':'id','GlucValue':'gl'})
             df_temp= df_temp.reset_index(drop=True)
@@ -71,3 +74,6 @@ def Loading_File(file_path):
 Shanghai_T1D = Loading_File(T1D)
 Shanghai_T2D = Loading_File(T2D)
 Shanghai = pd.concat([Shanghai_T1D, Shanghai_T2D])
+
+
+

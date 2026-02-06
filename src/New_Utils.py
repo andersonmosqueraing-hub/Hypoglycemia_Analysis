@@ -1,26 +1,37 @@
 import numpy as np
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-import ptitprince as pt
 from pandas import to_datetime
 from datetime import timedelta, date, datetime
 import math
 import pandas as pd
 
 
-def Event(Data,glucose_threshold):
-    'Data has to be type list'
-    'Threshold should be an integer'
+def Event(Data, glucose_threshold, minutes):
     C1 = 0
     C2 = 0
-    for i in range(len(Data)) :
-        if Data[i] < glucose_threshold:
-            C1+=1
-        if C1 == 3:
-            C2+=1
-        else:
-            C1 = 0
-        return 1 if C2 > 1 else 0
+    if minutes == 5:
+        for i in range(len(Data)):
+            # Solo si el dato es válido (no NaN) y menor al umbral
+            if Data[i] < glucose_threshold:
+                C1 += 1
+                if C1 == 3:
+                    C2 += 1
+            else:
+                # Si el nivel sube del umbral, se rompe la racha
+                C1 = 0
+                
+    else:
+        for i in range(len(Data)):
+            # Solo si el dato es válido (no NaN) y menor al umbral
+            if Data[i] < glucose_threshold:
+                C1 += 1
+                if C1 == 2:
+                    C2 += 1
+            else:
+                # Si el nivel sube del umbral, se rompe la racha
+                C1 = 0
+        #lo del Shanghai
+    return 1 if C2 >= 1 else 0
 
 # create a list for storing the data
 
@@ -69,7 +80,7 @@ def New_Sequences(data, glucose_threshold=54, days_week=7, minutes=5):
                 
                 # Cálculo de la etiqueta Y
                 # Usamos la lógica de duraciones del código anterior si prefieres
-                y_label = Event(week_y['gl'].tolist(), glucose_threshold)
+                y_label = Event(week_y['gl'].tolist(), glucose_threshold, minutes)
                 
                 sequences.append({
                     'patient': patient,

@@ -14,6 +14,8 @@ tf.autograph.set_verbosity(0)
 
 from src.minirocket_variable import fit, transform
 
+
+
 class Transformer:
     '''
     Transform the inputs with random convolutional kernels.
