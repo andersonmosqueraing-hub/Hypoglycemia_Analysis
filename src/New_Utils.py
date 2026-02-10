@@ -84,9 +84,8 @@ def New_Sequences(data, glucose_threshold=54, days_week=7, minutes=5):
                 
                 sequences.append({
                     'patient': patient,
-                    'start_x': week_x['ts'].min(),
-                    'end_x': week_x['ts'].max(),
-                    'start_y': week_y['ts'].min(),
+                    'start': week_x['ts'].min(),
+                    'end': week_x['ts'].max(),
                     'Y': y_label,
                     'X': week_x['gl'].tolist(),
                     'L': len(week_x)
@@ -94,6 +93,77 @@ def New_Sequences(data, glucose_threshold=54, days_week=7, minutes=5):
             
             # --- EL CAMBIO CLAVE PARA VENTANA FIJA ---
             # Saltamos la semana completa para que no haya solapamiento
+            current_start = current_end 
+            
+    return sequences
+
+def Sequences_Night(data, glucose_threshold=54, days_week=7, minutes=5):
+    Night_Start = 18
+    Night_End = 6
+    sequences = []
+    # 2016 lecturas para 7 días si es cada 5 min
+    expected_readings = int(days_week * 24 * 60 // minutes)
+    
+    # Pre-procesamiento global
+    data = data[(data['gl'] >= 40) & (data['gl'] <= 400)].copy()
+    data['ts'] = pd.to_datetime(data['ts'])
+    data['date'] = data['ts'].dt.date
+    data['hour'] = data['ts'].dt.hour
+    for patient, p_data in data.groupby('id'):
+        p_data = p_data.dropna(subset=['ts', 'gl']).sort_values('ts')
+        if p_data.empty: continue
+
+        min_date = p_data['date'].min()
+        max_date = p_data['date'].max()
+
+        if pd.isna(min_date) or pd.isna(max_date): continue
+            
+        current_start = min_date
+        
+        while current_start + pd.Timedelta(days=days_week * 2) <= max_date:
+            current_end = current_start + pd.Timedelta(days=days_week)
+            next_end = current_end + pd.Timedelta(days=days_week)
+            
+            mask_x = (p_data['date'] >= current_start) & (p_data['date'] < current_end)
+            mask_y = (p_data['date'] >= current_end) & (p_data['date'] < next_end)
+            
+            week_x = p_data[mask_x]
+            week_y = p_data[mask_y]
+            
+            if len(week_x) >= (expected_readings * 0.7) and len(week_y) >= (expected_readings * 0.7):
+                
+                # 1. Calculamos la etiqueta general (¿Hay hipo en la semana Y?)
+                y_label = Event(week_y['gl'].tolist(), glucose_threshold, minutes)
+                
+                y_night_label = 0
+                
+                # 2. Solo si hay hipo (Y=1), verificamos si fue nocturna
+                if y_label == 1:
+                    # Filtramos los momentos de la semana Y donde hubo hipo
+                    low_glucose_moments = week_y[week_y['gl'] < glucose_threshold]
+                    
+                    # Verificamos si alguna de esas horas cae en rango nocturno
+                    # Rango: hora >= 18 O hora < 6
+                    is_night = low_glucose_moments['hour'].apply(
+                        lambda h: h >= Night_Start or h < Night_End
+                    )
+                    
+                    if is_night.any():
+                        y_night_label = 1
+                
+                # Guardamos la secuencia
+                # Nota: 'Y' sigue siendo la etiqueta general, 
+                # y podemos añadir 'Y_night' para tu análisis específico
+                sequences.append({
+                    'patient': patient,
+                    'start': week_x['ts'].min(),
+                    'end': week_x['ts'].max(),
+                    'Y': y_night_label, # Aquí asignamos 1 solo si fue hipo Y nocturna
+                    'Y_total': y_label,  # Mantenemos la original por si la necesitas
+                    'X': week_x['gl'].tolist(),
+                    'L': len(week_x)
+                })
+            
             current_start = current_end 
             
     return sequences
