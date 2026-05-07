@@ -1,0 +1,32 @@
+Replace BG: Entrenamiento
+AIDE: Validación Interna
+T1 Diabetes Granada: Validación externa
+
+Hipoglicemia
+Umbral < 54
+Tiempo < 30 min 
+
+Folds = 5
+Ventana nocturna = 12 pm a 6 am
+
+
+Nocturna
+Minirocket es una novedad.
+Hyperparameters, sensibilidad a ellos usando diferentes técnicas. (grid search, randomized and bayesian search).
+
+
+Usamos granada o Replace para entrenar
+o la combinación de ambos?
+
+Usar replace - y justificar con base en lo que dijo la ingeniera en la grabación
+
+
+interpretabilidad?
+kernels - horas, momentos de la semana que puedan tener injerencia en la salida
+
+
+
+miércoles o jueves estar en el minirocket
+
+
+
